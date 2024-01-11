@@ -5,6 +5,7 @@
 import requests
 import os
 import csv
+import datetime
 
 
 from dotenv import load_dotenv
@@ -28,7 +29,7 @@ for item in lib_json["response"]["data"]:
     movie_info = media_info.json()
     with open(f"{item['section_name']}.csv", "w", newline="") as file:
         writer = csv.writer(file)
-        field = ["title", "rating_key (id)", "file_size", "play_count", "last_played"]
+        field = ["title", "rating_key (id)", "file_size", "play_count", "last_played (Days ago)"]
 
         writer.writerow(field)
         for movie_info in movie_info["response"]["data"]["data"]:
@@ -38,13 +39,17 @@ for item in lib_json["response"]["data"]:
                 play_count = movie_info["play_count"]
             if movie_info["last_played"]:
                 last_played = movie_info["last_played"]
+                if last_played != 0:
+                    daysago = “Never Played”
+                else:
+                    daysago =  (datetime.now().timestamp() - int(movie_info[last_played]) / 8600
             writer.writerow(
                 [
                     movie_info["title"],
                     movie_info["rating_key"],
                     movie_info["file_size"],
                     play_count,
-                    last_played,
+                    daysago,
                 ]
             )
         print(f"Successfully written to {item['section_name']}.csv")
